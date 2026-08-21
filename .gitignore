@@ -1,0 +1,7 @@
+.build/
+dist/
+release/
+.swiftpm/
+.DS_Store
+*.previous.*.app
+directions.md

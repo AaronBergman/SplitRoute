@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: swift test
+      - name: Build release configuration
+        run: swift build -c release
+      - name: Validate scripts and plist
+        run: |
+          bash -n script/build_and_run.sh
+          bash -n script/package_release.sh
+          zsh -n Sources/SplitRoute/Resources/splitroute-controller.sh
+          plutil -lint Support/Info.plist
