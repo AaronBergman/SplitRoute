@@ -4,11 +4,13 @@ set -euo pipefail
 
 APP_NAME="SplitRoute"
 VERSION="0.1"
+DMG_FILENAME="$APP_NAME-v$VERSION.dmg"
+CHECKSUM_FILENAME="$DMG_FILENAME.sha256"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RELEASE_DIR="$ROOT_DIR/release"
-DMG_PATH="$RELEASE_DIR/$APP_NAME-v$VERSION.dmg"
-CHECKSUM_PATH="$DMG_PATH.sha256"
+DMG_PATH="$RELEASE_DIR/$DMG_FILENAME"
+CHECKSUM_PATH="$RELEASE_DIR/$CHECKSUM_FILENAME"
 WORK_DIR="$(mktemp -d "${TMPDIR:-/private/tmp}/splitroute-release.XXXXXX")"
 APP_BUNDLE="$WORK_DIR/$APP_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
@@ -91,7 +93,11 @@ fi
 
 hdiutil detach "$MOUNT_POINT" >/dev/null
 MOUNTED=0
-shasum -a 256 "$DMG_PATH" > "$CHECKSUM_PATH"
+(
+    cd "$RELEASE_DIR"
+    shasum -a 256 "$DMG_FILENAME" > "$CHECKSUM_FILENAME"
+    shasum -a 256 -c "$CHECKSUM_FILENAME"
+)
 
 echo "Created $DMG_PATH"
 echo "Created $CHECKSUM_PATH"
